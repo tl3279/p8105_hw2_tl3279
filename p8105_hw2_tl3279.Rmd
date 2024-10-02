@@ -132,7 +132,8 @@ Calculate the total weight of trash collected by Professor Trash Wheel.
 ```{r}
 TW_tidy |>
   filter(trash_wheel == "Professor Trash Wheel") |>
-  summarize(total_weight = sum(weight_tons, na.rm = TRUE))
+  pull(weight_tons) |>
+  sum(na.rm = TRUE)
 ```
 Professor Trash Wheel collected a total of 246.74 tons of trash
 
@@ -141,7 +142,8 @@ Calculate the total number of cigarette butts collected by Gwynnda in June of 20
 ```{r}
 TW_tidy |>
   filter(trash_wheel == "Gwynnda Trash Wheel", month == "June", year == 2022) |>
-  summarize(total_cig = sum(cigarette_butts, na.rm = TRUE))
+  pull(cigarette_butts) |>
+  sum(na.rm = TRUE)
 ```
 In June 2022, Gwynnda Trash Wheel collected 18120 cigarette butts.
 
@@ -219,4 +221,45 @@ baker_table =
   arrange(series, episode)
 kable(baker_table, caption = "Star Baker or Winner for Seasons 5 through 10")
 ```
+Predictable Winners: 
+In many seasons, the final winner was predictable. For example, Richard Burr 
+(Season 5) and Nadiya Hussain (Season 6) were named "Star Baker" multiple times,
+making their wins expected.
 
+Surprises: 
+David Atherton (Season 10) was a surprise winner, as he did not win any "Star 
+Baker" before the final. 
+
+Working on the viewwr dataset
+```{r message = FALSE}
+viewers = 
+  read_csv("data/viewers.csv") |>
+  janitor::clean_names() |>
+  pivot_longer(
+    cols = starts_with("series_"), 
+    names_to = "season", 
+    values_to = "viewership") |>
+  mutate(season = readr::parse_number(season))
+```
+
+Print the first 10 rows
+```{r}
+print(head(viewers, 10))
+```
+
+Calculate the mean
+```{r}
+viewers |>
+  filter(season == 1) |>
+  pull(viewership) |>
+  mean(na.rm = TRUE)
+```
+The mean viewership in Season 1 is 2.77.
+
+```{r}
+viewers |>
+  filter(season == 5) |>
+  pull(viewership) |>
+  mean(na.rm = TRUE)
+```
+The mean viewership in Season 5 is 10.0393.
