@@ -97,13 +97,15 @@ Mr_TW = read_excel(
   mutate(year = as.numeric(year))
 ```
 
-Do the same things with Professor Trash Wheel and Gwynnda.
+Do the same things with Professor Trash Wheel and Gwynnda. (Remove one row in 
+Professor Trash Wheel that only has dumpster number recorded).
 ```{r}
 Prof_TW = read_excel(
   "data/202409 Trash Wheel Collection Data.xlsx",
   sheet = "Professor Trash Wheel",
   skip = 1) |>
   janitor::clean_names() |>
+  filter(!is.na(date)) |>
   filter(!is.na(dumpster)) |>
   mutate(trash_wheel = "Professor Trash Wheel")
 
@@ -204,22 +206,24 @@ write_csv(baker_tidy, "data/baker_tidy.csv")
 
 janitor::clean_names() are used to standard column names. Variations of 
 "Joanne Wheatley" (e.g., "Jo", "Jo Wheatley") were standardized across all 
-datasets to ensure proper merging. The datasets were combined using left_join(),
-and columns were reordered for a better view (general information first, 
-followed by baker details and bake-related data). 
+datasets to ensure proper merging (checked by anti_join and corrected this 
+problem). The datasets were combined using left_join(), and columns were 
+reordered for a better view (general information first, followed by baker 
+details and bake-related data). 
 
-The final dataset comprehensive summary of bakers (1,136 X 10 ), such as the 
-series and episode number, baker information (name, age, occupation, hometown), 
-and their performance in challenges (signature_bake, show_stopper, technical). 
+The final dataset comprehensive summary of bakers (1,136 rows X 10 columns), 
+such as the series and episode number, baker information (name, age, occupation, 
+hometown), and their performance in challenges (signature_bake, show_stopper, 
+technical). 
 
-Create the table
+Create the table for Star Baker or Winner for Season 5 - Season 10
 ```{r}
 baker_table =
   baker_tidy |>
   filter(series %in% 5:10, !is.na(result) & result %in% c("STAR BAKER", "WINNER")) |>
   select(series, episode, baker_name, result) |>
   arrange(series, episode)
-kable(baker_table, caption = "Star Baker or Winner for Seasons 5 through 10")
+kable(baker_table)
 ```
 Predictable Winners: 
 In many seasons, the final winner was predictable. For example, Richard Burr 
