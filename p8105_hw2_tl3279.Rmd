@@ -8,6 +8,8 @@ output: github_document
 ```{r setup, include=FALSE}
 library(tidyverse)
 library(readxl)
+library(dplyr)
+library(knitr)
 ```
 
 ## Problem 1
@@ -190,10 +192,31 @@ baker_tidy =
   select(series, episode, baker_name, baker_age, baker_occupation, hometown,
          signature_bake, show_stopper, technical, result) |>
   arrange(series, episode, baker_name)
+baker_tidy
 ```
 
 Save the dataset to local file
 ```{r}
 write_csv(baker_tidy, "data/baker_tidy.csv")
+```
+
+janitor::clean_names() are used to standard column names. Variations of 
+"Joanne Wheatley" (e.g., "Jo", "Jo Wheatley") were standardized across all 
+datasets to ensure proper merging. The datasets were combined using left_join(),
+and columns were reordered for a better view (general information first, 
+followed by baker details and bake-related data). 
+
+The final dataset comprehensive summary of bakers (1,136 X 10 ), such as the 
+series and episode number, baker information (name, age, occupation, hometown), 
+and their performance in challenges (signature_bake, show_stopper, technical). 
+
+Create the table
+```{r}
+baker_table =
+  baker_tidy |>
+  filter(series %in% 5:10, !is.na(result) & result %in% c("STAR BAKER", "WINNER")) |>
+  select(series, episode, baker_name, result) |>
+  arrange(series, episode)
+kable(baker_table, caption = "Star Baker or Winner for Seasons 5 through 10")
 ```
 
