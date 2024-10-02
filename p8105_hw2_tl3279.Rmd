@@ -120,8 +120,24 @@ TW_tidy =
   bind_rows(Mr_TW, Prof_TW, Gw_TW) |>
   janitor::clean_names()
 TW_tidy
+cat("The combined dataset contains", nrow(TW_tidy), "observations.")
 ```
 1033 observations in the resulting dataset. Key variables include dumpster, 
 year, weight_tons, and so on. 
 
+Calculate the total weight of trash collected by Professor Trash Wheel.
+```{r}
+TW_tidy |>
+  filter(trash_wheel == "Professor Trash Wheel") |>
+  summarize(total_weight = sum(weight_tons, na.rm = TRUE))
+```
+Professor Trash Wheel collected a total of 246.74 tons of trash
 
+Calculate the total number of cigarette butts collected by Gwynnda in June of 2022.
+
+```{r}
+TW_tidy |>
+  filter(trash_wheel == "Gwynnda Trash Wheel", month == "June", year == 2022) |>
+  summarize(total_cig = sum(cigarette_butts, na.rm = TRUE))
+```
+In June 2022, Gwynnda Trash Wheel collected 18120 cigarette butts.
