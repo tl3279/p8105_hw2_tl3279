@@ -239,7 +239,9 @@ viewers =
     cols = starts_with("series_"), 
     names_to = "season", 
     values_to = "viewership") |>
-  mutate(season = readr::parse_number(season))
+  mutate(season = readr::parse_number(season)) |>
+  relocate(season) |>
+  arrange(season, episode)
 ```
 
 Print the first 10 rows
