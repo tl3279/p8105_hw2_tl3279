@@ -79,7 +79,8 @@ Of the stations that serve the A train 17 stations are ASA compliant.
 
 import the Mr. Trash Wheel dataset. Drop the figure, select only columns with 
 data entrances. Omit rows without dumpster-specific data. Round sports balls 
-to integers.
+to integers. Add a name to identify that this is Mr. Trash Wheel. Change the 
+variable type for year so it matches with the other two datasets.
 ```{r message = FALSE}
 Mr_TW = read_excel(
   "data/202409 Trash Wheel Collection Data.xlsx",
@@ -89,7 +90,38 @@ Mr_TW = read_excel(
   janitor::clean_names() |>
   select(1:14) |>
   filter(!is.na(dumpster)) |>
-  mutate(sports_balls = as.integer(round(sports_balls)))
-Mr_TW
+  mutate(sports_balls = as.integer(round(sports_balls))) |>
+  mutate(trash_wheel = "Mr. Trash Wheel") |>
+  mutate(year = as.numeric(year))
 ```
+
+Do the same things with Professor Trash Wheel and Gwynnda.
+```{r}
+Prof_TW = read_excel(
+  "data/202409 Trash Wheel Collection Data.xlsx",
+  sheet = "Professor Trash Wheel",
+  skip = 1) |>
+  janitor::clean_names() |>
+  filter(!is.na(dumpster)) |>
+  mutate(trash_wheel = "Professor Trash Wheel")
+
+Gw_TW = read_excel(
+  "data/202409 Trash Wheel Collection Data.xlsx",
+  sheet = "Gwynnda Trash Wheel",
+  skip = 1) |>
+  janitor::clean_names() |>
+  filter(!is.na(dumpster)) |>
+  mutate(trash_wheel = "Gwynnda Trash Wheel")
+```
+
+Bind the datasets
+```{r}
+TW_tidy = 
+  bind_rows(Mr_TW, Prof_TW, Gw_TW) |>
+  janitor::clean_names()
+TW_tidy
+```
+1033 observations in the resulting dataset. Key variables include dumpster, 
+year, weight_tons, and so on. 
+
 
