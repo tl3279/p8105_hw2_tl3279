@@ -7,6 +7,7 @@ output: github_document
 
 ```{r setup, include=FALSE}
 library(tidyverse)
+library(readxl)
 ```
 
 ## Problem 1
@@ -73,3 +74,22 @@ station_A_ADA =
 station_A_ADA
 ```
 Of the stations that serve the A train 17 stations are ASA compliant.
+
+## Problem 2
+
+import the Mr. Trash Wheel dataset. Drop the figure, select only columns with 
+data entrances. Omit rows without dumpster-specific data. Round sports balls 
+to integers.
+```{r message = FALSE}
+Mr_TW = read_excel(
+  "data/202409 Trash Wheel Collection Data.xlsx",
+  sheet = "Mr. Trash Wheel",
+  skip = 1
+) |>
+  janitor::clean_names() |>
+  select(1:14) |>
+  filter(!is.na(dumpster)) |>
+  mutate(sports_balls = as.integer(round(sports_balls)))
+Mr_TW
+```
+
