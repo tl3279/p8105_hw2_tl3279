@@ -114,7 +114,8 @@ Gw_TW = read_excel(
   mutate(trash_wheel = "Gwynnda Trash Wheel")
 ```
 
-Bind the datasets
+Bind the datasets.
+
 ```{r}
 TW_tidy = 
   bind_rows(Mr_TW, Prof_TW, Gw_TW) |>
@@ -122,8 +123,8 @@ TW_tidy =
 TW_tidy
 cat("The combined dataset contains", nrow(TW_tidy), "observations.")
 ```
-1033 observations in the resulting dataset. Key variables include dumpster, 
-year, weight_tons, and so on. 
+
+Key variables include dumpster, year, weight_tons, and so on. 
 
 Calculate the total weight of trash collected by Professor Trash Wheel.
 ```{r}
@@ -141,3 +142,58 @@ TW_tidy |>
   summarize(total_cig = sum(cigarette_butts, na.rm = TRUE))
 ```
 In June 2022, Gwynnda Trash Wheel collected 18120 cigarette butts.
+
+## Problem 3
+
+Load the datasets. Create a new variable first name for bakers.csv so it can 
+match with the other two dataset. Remove the "" for one name in bakes. Replace 
+the full name Joanne to Jo as recorded in other two datasets.
+```{r message = FALSE}
+bakers = 
+  read_csv("data/bakers.csv") |> 
+  janitor::clean_names() |> 
+  mutate(first_name = word(baker_name, 1))
+bakes =
+  read_csv("data/bakes.csv") |> 
+  janitor::clean_names() |>
+  mutate(baker = str_replace_all(baker, '"', ""))
+results = 
+  read_csv("data/results.csv",
+           skip = 2) |> 
+  janitor::clean_names() |>
+  mutate(baker = str_replace_all(baker, "Joanne", "Jo"))
+```
+
+Check for completeness and correctness
+```{r}
+anti_join(results, bakers, by = c("baker" = "first_name", "series"))
+```
+All bakers in results can be found in bakers.
+
+```{r}
+anti_join(bakes, bakers, by = c("baker" = "first_name", "series"))
+```
+All bakers in bakes can be found in bakers.
+
+Combine the dataset
+```{r}
+baker_tidy =
+  bakers |> 
+  left_join(results, by = c("first_name" = "baker", "series")) |>
+  left_join(bakes, by = c("first_name" = "baker", "series", "episode"))
+```
+
+Rearrange the variables and order of the data 
+```{r}
+baker_tidy =
+  baker_tidy |>
+  select(series, episode, baker_name, baker_age, baker_occupation, hometown,
+         signature_bake, show_stopper, technical, result) |>
+  arrange(series, episode, baker_name)
+```
+
+Save the dataset to local file
+```{r}
+write_csv(baker_tidy, "data/baker_tidy.csv")
+```
+
